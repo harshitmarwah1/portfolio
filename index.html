@@ -643,25 +643,30 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
 .stack-cards{ display:flex; flex-direction:column; gap:1.15rem; }
 .build{ opacity:1; transform:none; }
 
-/* -- enhanced (desktop, motion allowed): JS adds .pin-active / .stack-active -- */
+/* -- enhanced (all screen sizes, motion allowed): JS adds .pin-active / .stack-active --
+   dvh (not vh) so mobile browser toolbars showing/hiding doesn't shift the pinned box.
+   translate3d + backface-visibility force a GPU compositing layer, avoiding the flicker
+   Safari's momentum scroll causes on sticky/absolute elements without one. */
 .pin-wrap.pin-active{ position:relative; }
 .pin-wrap.pin-active .pin-stage{
-  position:sticky; top:0; height:100vh; overflow:hidden;
+  position:sticky; top:0; height:100vh; height:100dvh; overflow:hidden;
   display:block;
 }
 .pin-wrap.pin-active .hero-layer,
 .pin-wrap.pin-active .about-layer{
   position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center;
   padding-top:3.4rem; transition:none; will-change:opacity,transform,filter;
+  transform:translate3d(0,0,0); backface-visibility:hidden;
 }
 .pin-wrap.pin-active .about-layer{
   border-top:none; margin-top:0; padding-top:3.4rem;
   justify-content:flex-start; padding-bottom:2rem; overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
 }
 
 .stack-wrap.stack-active{ position:relative; }
 .stack-wrap.stack-active .stack-stage{
-  position:sticky; top:0; height:100vh; overflow:hidden;
+  position:sticky; top:0; height:100vh; height:100dvh; overflow:hidden;
   padding-top:3.4rem; display:flex; flex-direction:column;
 }
 .stack-wrap.stack-active .sec-head{
@@ -670,13 +675,28 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
 .stack-wrap.stack-active .sec-head-intro{ display:none; }
 .stack-wrap.stack-active .stack-cards{ position:relative; flex:1; min-height:0; display:block; }
 .stack-wrap.stack-active .build{
-  position:absolute; inset:0 0 1.5rem 0; overflow-y:auto;
+  position:absolute; inset:0 0 1.5rem 0; overflow-y:auto; -webkit-overflow-scrolling:touch;
   transition:none; will-change:opacity,transform;
+  transform:translate3d(0,0,0); backface-visibility:hidden;
 }
 .stack-wrap.stack-active .build .shot{ max-height:32vh; }
 .stack-wrap.stack-active .build .shot img{ height:100%; object-fit:cover; object-position:top; }
 
-@media (max-width:760px){
+/* Small phones: less vertical room than a laptop, so trim the same layout tighter
+   rather than dropping the effect. */
+@media (max-width:520px){
+  .pin-wrap.pin-active .hero-layer,
+  .pin-wrap.pin-active .about-layer{ padding-top:2.8rem; }
+  .stack-wrap.stack-active .stack-stage{ padding-top:2.8rem; }
+  .stack-wrap.stack-active .sec-head{ margin-bottom:0.7rem; }
+  .stack-wrap.stack-active .sec-head h2{ font-size:1.15rem; }
+  .stack-wrap.stack-active .build{ padding:1.05rem 1.2rem; }
+  .stack-wrap.stack-active .build .shot{ max-height:22vh; }
+  .stack-wrap.stack-active .build .stats{ gap:0.4rem; }
+  .stack-wrap.stack-active .build .stats li{ padding:0.4rem 0.55rem; }
+}
+
+@media (prefers-reduced-motion: reduce){
   .pin-wrap.pin-active .pin-stage,
   .stack-wrap.stack-active .stack-stage{ position:static; height:auto; overflow:visible; }
   .pin-wrap.pin-active .hero-layer,
@@ -994,10 +1014,8 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
 
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var active = false;
-    var ticking = false;
+    var rafId = null;
     var aboutFocusedFired = false;
-
-    function isWide() { return window.innerWidth > 760; }
 
     function frac(el) {
       var r = el.getBoundingClientRect();
@@ -1047,19 +1065,13 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
       }
     }
 
-    function onScroll() {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(function () { ticking = false; render(); });
-    }
-
-    function clearInline(el, props) {
-      if (!el) return;
-      props.forEach(function (k) { el.style[k] = ''; });
+    function tick() {
+      render();
+      rafId = requestAnimationFrame(tick);
     }
 
     function activate() {
-      if (active || reduce || !isWide()) return;
+      if (active || reduce) return;
       active = true;
       if (pinWrap) { pinWrap.classList.add('pin-active'); pinWrap.style.height = '230vh'; }
       if (stackWrap) {
@@ -1068,38 +1080,12 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
         stackWrap.style.height = (cards.length * 118) + 'vh';
         cards.forEach(function (c, i) { c.style.zIndex = String(i + 1); });
       }
-      window.addEventListener('scroll', onScroll, { passive: true });
-      render();
+      // A continuous rAF tick (not just scroll-event driven) survives iOS Safari's known bug
+      // where window.scrollY / scroll events stop firing reliably mid fast-flick.
+      rafId = requestAnimationFrame(tick);
     }
 
-    function deactivate() {
-      if (!active) return;
-      active = false;
-      window.removeEventListener('scroll', onScroll);
-      if (pinWrap) {
-        pinWrap.classList.remove('pin-active');
-        pinWrap.style.height = '';
-        clearInline(pinWrap.querySelector('.hero-layer'), ['opacity', 'filter', 'transform']);
-        clearInline(pinWrap.querySelector('.about-layer'), ['opacity', 'filter', 'transform']);
-      }
-      if (stackWrap) {
-        stackWrap.classList.remove('stack-active');
-        stackWrap.style.height = '';
-        stackWrap.querySelectorAll('.build').forEach(function (c) {
-          clearInline(c, ['opacity', 'transform', 'zIndex', 'pointerEvents']);
-        });
-      }
-    }
-
-    function evaluate() { if (isWide() && !reduce) activate(); else deactivate(); }
-
-    var resizeTo;
-    window.addEventListener('resize', function () {
-      clearTimeout(resizeTo);
-      resizeTo = setTimeout(evaluate, 150);
-    });
-
-    evaluate();
+    if (!reduce) activate();
   })();
 </script>
 
