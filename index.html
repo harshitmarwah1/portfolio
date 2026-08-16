@@ -684,9 +684,15 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
 .stack-wrap.stack-active .sec-head-intro{ display:none; }
 .stack-wrap.stack-active .stack-cards{ position:relative; flex:1; min-height:0; display:block; }
 .stack-wrap.stack-active .build{
-  position:absolute; inset:0 0 1.5rem 0; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  position:absolute; inset:0 0 1.5rem 0; overflow:hidden;
   transition:none; will-change:opacity,transform;
   transform:translate3d(0,0,0); backface-visibility:hidden;
+}
+/* Same reasoning as .about-scroll: keep the per-frame animation on .build itself, but let an
+   untouched inner element own the actual touch-scrollable overflow, so scrolling a card that's
+   taller than its box doesn't fight the animation and freeze. */
+.stack-wrap.stack-active .build-scroll{
+  height:100%; overflow-y:auto; -webkit-overflow-scrolling:touch;
 }
 .stack-wrap.stack-active .build .shot{ max-height:32vh; }
 .stack-wrap.stack-active .build .shot img{ height:100%; object-fit:cover; object-position:top; }
@@ -829,6 +835,7 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
 
       <!-- VMS -->
       <article class="card build">
+        <div class="build-scroll">
         <div class="card-top">
           <span class="card-tag">Self-directed case study · B2B SaaS</span>
           <span class="badge"><span class="live" aria-hidden="true"></span> Prototype live</span>
@@ -856,10 +863,12 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
           <li><span class="num">15-30d</span><span class="lbl">Problem being cut</span></li>
         </ul>
         <a class="proof-link" href="https://vendor-onboarding-mvp.vercel.app/login" target="_blank" rel="noopener">Try the live prototype yourself <span class="arrow" aria-hidden="true">→</span></a>
+        </div>
       </article>
 
       <!-- Saath -->
       <article class="card build">
+        <div class="build-scroll">
         <div class="card-top">
           <span class="card-tag">Self-directed case study · Elder care</span>
           <span class="badge">Prototype built</span>
@@ -887,10 +896,12 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
           <li><span class="num">$8.9B</span><span class="lbl">Silver economy</span></li>
         </ul>
         <p class="proof-note">Prototype and demo available on request.</p>
+        </div>
       </article>
 
       <!-- Last 200 Metres -->
       <article class="card build">
+        <div class="build-scroll">
         <div class="card-top">
           <span class="card-tag">Self-directed case study · Logistics</span>
           <span class="badge">Prototype built</span>
@@ -928,6 +939,7 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
           <li><span class="num">7.8M</span><span class="lbl">Orders a day</span></li>
         </ul>
         <p class="proof-note">Model and pitch available on request.</p>
+        </div>
       </article>
 
     </div>
