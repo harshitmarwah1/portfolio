@@ -743,6 +743,10 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
 }
 .stack-wrap.stack-active .sec-head-intro{ display:none; }
 .stack-wrap.stack-active .stack-cards{ position:relative; flex:1; min-height:0; display:block; }
+/* Depth for the desktop restrained 3D roll-over (mobile stays a flat stack). */
+@media (min-width:768px){
+  .stack-wrap.stack-active .stack-cards{ perspective:1700px; }
+}
 .stack-wrap.stack-active .build{
   position:absolute; inset:0 0 1.5rem 0; overflow:hidden;
   transition:none; will-change:opacity,transform;
@@ -1098,6 +1102,8 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
   (function () {
     var pinWrap = document.getElementById('pinHeroAbout');
     var stackWrap = document.getElementById('stackBuilds');
+    // Desktop-only restrained 3D card flip (mobile keeps its flat vertical stack).
+    var mqFlip = window.matchMedia('(min-width: 768px)');
     if (!pinWrap && !stackWrap) return;
 
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1143,14 +1149,30 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
         var n = cards.length;
         cards.forEach(function (c, i) {
           var t = Math.min(1, Math.max(0, (sp * n) - i));
-          var enter = Math.min(1, t / 0.08);
           var isLast = (i === n - 1);
-          var exit = isLast ? 0 : Math.max(0, (t - 0.9) / 0.1);
-          var opacity = enter * (1 - exit);
-          var ty = ((1 - enter) * 54) - (exit * 26);
-          var sc = 0.965 + 0.035 * enter - exit * 0.02;
-          c.style.opacity = String(opacity);
-          c.style.transform = 'translateY(' + ty.toFixed(1) + 'px) scale(' + sc.toFixed(3) + ')';
+          if (mqFlip.matches) {
+            // --- Desktop: restrained 3D roll-over (see grilling spec) ---
+            // Flip spans the first 35% of the card's scroll slice, ease-out, then holds flat.
+            var enterRaw = Math.min(1, t / 0.35);
+            var ease = 1 - Math.pow(1 - enterRaw, 3);            // easeOutCubic
+            var exitD = isLast ? 0 : Math.max(0, (t - 0.85) / 0.15);
+            var rotY = (1 - ease) * -55 + exitD * 15;            // 55deg roll in; small counter-tilt out
+            var ty = (1 - ease) * 30 - exitD * 6;
+            var sc = 0.92 + 0.08 * ease - exitD * 0.04;          // incoming grows in; outgoing recedes
+            c.style.transformOrigin = '50% 50%';
+            c.style.opacity = String(Math.min(1, enterRaw * 1.5) * (1 - exitD));
+            c.style.transform = 'translateY(' + ty.toFixed(1) + 'px) rotateY(' + rotY.toFixed(1) + 'deg) scale(' + sc.toFixed(3) + ')';
+            c.style.filter = 'brightness(' + (0.72 + 0.28 * ease).toFixed(3) + ')';  // dim while edged -> resolves into focus
+            c.style.boxShadow = '0 ' + (12 + 26 * ease).toFixed(0) + 'px ' + (26 + 40 * ease).toFixed(0) + 'px rgba(0,0,0,' + (0.12 + 0.20 * ease).toFixed(3) + ')';  // shadow strengthens as it faces flat
+          } else {
+            // --- Mobile: unchanged flat vertical stack ---
+            var enter = Math.min(1, t / 0.08);
+            var exit = isLast ? 0 : Math.max(0, (t - 0.9) / 0.1);
+            c.style.opacity = String(enter * (1 - exit));
+            c.style.transform = 'translateY(' + (((1 - enter) * 54) - (exit * 26)).toFixed(1) + 'px) scale(' + (0.965 + 0.035 * enter - exit * 0.02).toFixed(3) + ')';
+            c.style.filter = '';
+            c.style.boxShadow = '';
+          }
           c.style.pointerEvents = (t > 0.05 && t < 0.98) ? 'auto' : 'none';
         });
       }
