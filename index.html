@@ -660,8 +660,17 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
 }
 .pin-wrap.pin-active .about-layer{
   border-top:none; margin-top:0; padding-top:3.4rem;
-  justify-content:flex-start; padding-bottom:2rem; overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
+  justify-content:flex-start; overflow:hidden;
+}
+/* .about-scroll is the ACTUAL scrollable region (not .about-layer itself). Splitting these
+   matters: .about-layer gets a transform/opacity write every animation frame (for the crossfade),
+   and rewriting an element's own style every frame while it also owns touch-scroll overflow is a
+   known way to freeze native momentum scrolling on mobile Safari. Keeping the per-frame writes on
+   an outer, non-scrolling wrapper and putting overflow-y:auto on this untouched inner element
+   keeps touch scrolling responsive. */
+.pin-wrap.pin-active .about-scroll{
+  flex:1; min-height:0; width:100%; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  padding-bottom:2rem;
 }
 
 .stack-wrap.stack-active{ position:relative; }
@@ -687,6 +696,11 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
 @media (max-width:520px){
   .pin-wrap.pin-active .hero-layer,
   .pin-wrap.pin-active .about-layer{ padding-top:2.8rem; }
+  .pin-wrap.pin-active .terminal .term-body{
+    font-size:0.78rem; line-height:1.48; padding:0.85rem 0.9rem 1rem; min-height:0;
+  }
+  .pin-wrap.pin-active .terminal .term-body .gap{ height:0.5rem; }
+  .pin-wrap.pin-active .terminal .term-bar{ padding:0.45rem 0.7rem; }
   .stack-wrap.stack-active .stack-stage{ padding-top:2.8rem; }
   .stack-wrap.stack-active .sec-head{ margin-bottom:0.7rem; }
   .stack-wrap.stack-active .sec-head h2{ font-size:1.15rem; }
@@ -730,6 +744,7 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
   </div>
 
   <div class="about-layer wrap" aria-labelledby="about-h">
+    <div class="about-scroll">
     <p class="eyebrow" id="about-h">~/about</p>
     <div class="terminal" role="img" aria-label="Terminal session introducing Harshit Marwah: a builder PM with 13 years in infrastructure who now takes products from a blank page to a working prototype.">
       <div class="term-bar">
@@ -737,6 +752,7 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
         <span class="title">harshitmarwah · zsh · ~/about</span>
       </div>
       <div class="term-body" id="termBody"></div>
+    </div>
     </div>
   </div>
   </div>
@@ -1052,9 +1068,9 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
         var n = cards.length;
         cards.forEach(function (c, i) {
           var t = Math.min(1, Math.max(0, (sp * n) - i));
-          var enter = Math.min(1, t / 0.22);
+          var enter = Math.min(1, t / 0.08);
           var isLast = (i === n - 1);
-          var exit = isLast ? 0 : Math.max(0, (t - 0.82) / 0.18);
+          var exit = isLast ? 0 : Math.max(0, (t - 0.9) / 0.1);
           var opacity = enter * (1 - exit);
           var ty = ((1 - enter) * 54) - (exit * 26);
           var sc = 0.965 + 0.035 * enter - exit * 0.02;
@@ -1073,11 +1089,12 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
     function activate() {
       if (active || reduce) return;
       active = true;
-      if (pinWrap) { pinWrap.classList.add('pin-active'); pinWrap.style.height = '230vh'; }
+      if (pinWrap) { pinWrap.classList.add('pin-active'); pinWrap.style.height = '230vh'; pinWrap.style.height = '230dvh'; }
       if (stackWrap) {
         var cards = stackWrap.querySelectorAll('.build');
         stackWrap.classList.add('stack-active');
         stackWrap.style.height = (cards.length * 118) + 'vh';
+        stackWrap.style.height = (cards.length * 118) + 'dvh';
         cards.forEach(function (c, i) { c.style.zIndex = String(i + 1); });
       }
       // A continuous rAF tick (not just scroll-event driven) survives iOS Safari's known bug
