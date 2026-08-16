@@ -1,0 +1,83 @@
+# Harshit Marwah
+
+> Product Manager · Builder PM. A builder PM with 13 years of infrastructure depth. I take
+> products from a blank page to something that runs. Based in Bangalore, India. Open to any
+> geography and actively interviewing.
+
+This is a plain-text/Markdown version of https://harshitmarwah.vercel.app/, published for AI
+agents and crawlers. All facts below come from the live portfolio.
+
+## Contact
+
+- Email: harshit.marwah@yahoo.com
+- LinkedIn: https://www.linkedin.com/in/harshit-marwah-0484413a/
+- GitHub: https://github.com/harshitmarwah1
+- Website: https://harshitmarwah.vercel.app/
+
+## About
+
+Thirteen years in enterprise infrastructure. Five of them in product; the rest as the engineer
+who built and ran the systems underneath it. A generalist AI PM whose differentiator is real
+infrastructure depth — comfortable taking a product from a blank page to a working prototype.
+
+## Work
+
+### NetApp — Product Manager (2022 to now), Bangalore
+Winning AI workloads for an enterprise platform. NetApp's object storage had to win the new wave
+of AI and analytics workloads, not just the buyers it already had.
+- Role: Product Manager. Owns the vision, roadmap, PRDs, and go-to-market for the product.
+- What I did: Shipped features and third-party integrations that made the product compatible with
+  AI applications. Wrote the PRDs that set workload priority and cut the team's planning cycle.
+- Results: 65% YoY adoption growth · 25% faster planning cycle · 13 years in storage & infra.
+
+### Career history
+- Product Manager — NetApp, Bangalore (2022 to now)
+- Product Owner — FIS Global, Bangalore (2019 to 2022)
+- Senior Engineer — NetApp, Bangalore (2016 to 2019)
+- Storage & Backup Specialist — HCL, Noida (2012 to 2016)
+- Selected metrics: $2M tooling saved at FIS · 99.2% infra uptime reached · deploy time cut
+  from 2 days to 15 minutes.
+
+## Builds (self-directed case studies)
+
+Three self-directed case studies, each taken from a blank page to a working prototype.
+
+### Vendor onboarding, in one workflow — B2B SaaS
+Prototype live: https://vendor-onboarding-mvp.vercel.app/admin
+- Problem: Onboarding a vendor takes 15–30 business days across email, spreadsheets, and four
+  separate systems, and nobody can see where a vendor is stuck.
+- Role: Product manager and builder. Framed the problem, scoped the MVP, built the prototype.
+- What I built: A self-service onboarding portal with role-based access and department SLAs, and a
+  clearance model that runs Legal, Financial, Personnel, and Security checks in parallel — the whole
+  vendor lifecycle modeled as a state machine.
+- Outcome: Moves onboarding from a 15–30-day scramble to one tracked workflow every team can see.
+- Metrics: 4 parallel clearances · 12 personas mapped · 15–30 days being cut.
+
+### Saath — Someone shows up when it matters — Elder care
+- Problem: India has 150 million elderly people, and formal senior care reaches barely 1% of them.
+  Families living far away have no reliable way to know a parent is alright tonight.
+- Role: Product manager and builder. Ran the research and shaped the product end to end.
+- What I built: A monitoring service on contactless Wi-Fi sensing — no camera, no microphone,
+  nothing to wear — paired with an app where every alert goes to a named person, not a group.
+- Evidence: 49 interviews across families, doctors, nurses, and insurers; a Bengaluru pilot scoped
+  with an NGO and a cardiac hospital.
+- Metrics: 49 interviews run · 150M elderly in India · $8.9B silver economy.
+
+### The last 200 metres nobody owns — Logistics
+- Problem: India runs 7.8 million quick-commerce orders a day. The last stretch, from the society
+  gate to the door, lands on security desks and riders; one 600-flat society pushes 280+ parcels a
+  day through a single desk.
+- Role: Product and business modeling. Built the operating model and the case for it.
+- What I built: A micro-logistics hub at the gate — smart lockers, verified runners, and a
+  15-minute delivery circuit — with unit economics and a seed-stage business case.
+- Outcome: Unit economics move from 27% margin in month one to 48% by month twenty-four, with
+  payback inside a few months.
+- Metrics: ₹2,900 Cr total market · margin 27%→48% (month 1 to 24) · 7.8M orders a day.
+
+## Skills
+
+- Product: strategy & roadmap, discovery & user research, PRDs & user stories, prioritization,
+  go-to-market, metrics & analytics.
+- Building & technical: working web prototypes, state modeling, Python, SQL / NoSQL, Ansible, Figma.
+- Cloud & object storage: S3 API.
+- Worked across: enterprise infrastructure, B2B SaaS, healthcare, logistics.
