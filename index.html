@@ -1138,21 +1138,47 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
         var p = frac(pinWrap);
         var hl = pinWrap.querySelector('.hero-layer');
         var al = pinWrap.querySelector('.about-layer');
-        var hp = Math.min(1, p / 0.55);
-        if (hl) {
-          hl.style.opacity = String(1 - 0.85 * hp);
-          hl.style.filter = 'blur(' + (hp * 7).toFixed(1) + 'px)';
-          hl.style.transform = 'scale(' + (1 - 0.03 * hp).toFixed(3) + ')';
-          // Hero owns clicks (its contact links) while it's the front layer.
-          hl.style.pointerEvents = hp < 0.5 ? 'auto' : 'none';
+        var termEl = pinWrap.querySelector('.terminal');
+        var focusReady;
+        if (mqFlip.matches) {
+          // DESKTOP: sequenced entrance — hero dissolves out cleanly, the ~/about heading
+          // settles and FREEZES (no move/scale), THEN the terminal fades in, THEN typing.
+          var hp = Math.max(0, Math.min(1, p / 0.4));
+          if (hl) {
+            hl.style.opacity = String(1 - hp);                        // clean dissolve to 0
+            hl.style.filter = 'blur(' + (hp * 4).toFixed(1) + 'px)';  // gentler blur
+            hl.style.transform = 'scale(' + (1 - 0.02 * hp).toFixed(3) + ')';
+            hl.style.pointerEvents = hp < 0.5 ? 'auto' : 'none';
+          }
+          var layerA = Math.max(0, Math.min(1, (p - 0.25) / 0.2));    // heading settles by p=0.45
+          if (al) {
+            al.style.opacity = String(layerA);
+            al.style.transform = 'translate3d(0,0,0)';                // frozen: no rise/scale
+            al.style.filter = 'none';
+            al.style.pointerEvents = layerA > 0.5 ? 'auto' : 'none';
+          }
+          var termOwn = Math.max(0, Math.min(1, (p - 0.45) / 0.3));   // terminal fades 0.45 -> 0.75
+          if (termEl) termEl.style.opacity = String(termOwn);
+          focusReady = termOwn >= 0.999;                              // type only once fully faded in
+        } else {
+          // MOBILE: original crossfade, unchanged.
+          var hpm = Math.min(1, p / 0.55);
+          if (hl) {
+            hl.style.opacity = String(1 - 0.85 * hpm);
+            hl.style.filter = 'blur(' + (hpm * 7).toFixed(1) + 'px)';
+            hl.style.transform = 'scale(' + (1 - 0.03 * hpm).toFixed(3) + ')';
+            hl.style.pointerEvents = hpm < 0.5 ? 'auto' : 'none';
+          }
+          var ap = Math.max(0, Math.min(1, (p - 0.35) / 0.55));
+          if (al) {
+            al.style.opacity = String(ap);
+            al.style.transform = 'translateY(' + ((1 - ap) * 46).toFixed(1) + 'px) scale(' + (0.965 + 0.035 * ap).toFixed(3) + ')';
+            al.style.pointerEvents = ap > 0.5 ? 'auto' : 'none';
+          }
+          if (termEl) termEl.style.opacity = '';                      // layer opacity drives it (original)
+          focusReady = ap >= 0.9;
         }
-        var ap = Math.max(0, Math.min(1, (p - 0.35) / 0.55));
-        if (al) {
-          al.style.opacity = String(ap);
-          al.style.transform = 'translateY(' + ((1 - ap) * 46).toFixed(1) + 'px) scale(' + (0.965 + 0.035 * ap).toFixed(3) + ')';
-          al.style.pointerEvents = ap > 0.5 ? 'auto' : 'none';
-        }
-        if (!aboutFocusedFired && ap >= 0.9) {
+        if (!aboutFocusedFired && focusReady) {
           aboutFocusedFired = true;
           window.dispatchEvent(new Event('about-focused'));
         }
