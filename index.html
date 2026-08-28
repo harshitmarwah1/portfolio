@@ -1247,7 +1247,13 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
       rafId = requestAnimationFrame(tick);
     }
 
-    if (!reduce) activate();
+    // Mobile (<768px) keeps the plain, natively-scrolling fallback layout (see the
+    // "fallback-safe defaults" CSS): the pinned hero/about sequence and the flashcard
+    // stack both hijack touch scrolling on phones (a drag lands on a card's inner
+    // scroller and never advances the page, so later cards never appear). Only enable
+    // them on desktop, where there's room and a pointer. Reveal fade-ins and the
+    // terminal typewriter still run on mobile (the terminal has its own in-view trigger).
+    if (!reduce && mqFlip.matches) activate();
 
     // Desktop-only: snap scroll onto each builds card's finished (flat) state, so a scroll
     // commits to the next card and smoothly plays its flip to completion instead of leaving
