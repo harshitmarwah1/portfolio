@@ -40,7 +40,23 @@ of AI and analytics workloads, not just the buyers it already had.
 
 ## Builds (self-directed case studies)
 
-Three self-directed case studies, each taken from a blank page to a working prototype.
+One shipped MVP and three self-directed case studies, each taken from a blank page to something real.
+
+### Build your own AI, not another search box · AI upskilling (shipped MVP)
+Live product: https://kaamai.vercel.app
+- Problem: Most non-technical professionals type one-off questions into ChatGPT and get generic
+  answers back, nothing they keep. The people who get real leverage build their own AI, but "learn
+  to build AI" usually means code, jargon, and a course they abandon.
+- Role: Product manager and builder. Took it from problem and persona to a shipped, working product.
+- What I built: A guided, gamified PWA that walks someone from a blank page to a real AI assistant
+  they build in one sitting and keep. Plain HTML, CSS, and JS front end; a Supabase backend as the
+  system of record for identity, the saved assistant, progress, and funnel analytics; offline-first
+  sync; and email one-time-code login that works end to end.
+- Shipped: Live and installable at kaamai.vercel.app as rung one of a reskilling ladder. The whole
+  curriculum, every role and task, lives in JSON kept separate from the app, so content can grow
+  without touching code.
+- Metrics: 5-step build (blank page to live AI) · 36 role x task paths (9 roles x 4 tasks) · 45/45
+  automated tests passing.
 
 ### Vendor onboarding, in one workflow — B2B SaaS
 Prototype live: https://vendor-onboarding-mvp.vercel.app/admin
