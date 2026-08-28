@@ -1235,7 +1235,11 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
       if (active || reduce) return;
       active = true;
       if (pinWrap) { pinWrap.classList.add('pin-active'); pinWrap.style.height = '230vh'; pinWrap.style.height = '230dvh'; }
-      if (stackWrap) {
+      // The pinned hero/about/terminal sequence runs on all screen sizes. The builds
+      // flashcard STACK is desktop-only: on phones it hijacks touch scrolling (a drag
+      // lands on a card's inner scroller and never advances the page, so later cards
+      // never appear), so mobile keeps the plain, natively-scrolling card list.
+      if (stackWrap && mqFlip.matches) {
         var cards = stackWrap.querySelectorAll('.build');
         stackWrap.classList.add('stack-active');
         stackWrap.style.height = (cards.length * 118) + 'vh';
@@ -1247,13 +1251,7 @@ body{ font-family:var(--font-sans); letter-spacing:-0.003em; }
       rafId = requestAnimationFrame(tick);
     }
 
-    // Mobile (<768px) keeps the plain, natively-scrolling fallback layout (see the
-    // "fallback-safe defaults" CSS): the pinned hero/about sequence and the flashcard
-    // stack both hijack touch scrolling on phones (a drag lands on a card's inner
-    // scroller and never advances the page, so later cards never appear). Only enable
-    // them on desktop, where there's room and a pointer. Reveal fade-ins and the
-    // terminal typewriter still run on mobile (the terminal has its own in-view trigger).
-    if (!reduce && mqFlip.matches) activate();
+    if (!reduce) activate();
 
     // Desktop-only: snap scroll onto each builds card's finished (flat) state, so a scroll
     // commits to the next card and smoothly plays its flip to completion instead of leaving
